@@ -71,6 +71,7 @@ class UserAgentHelper extends AppHelper {
     private function detect_browser_version($title){
 
         //fix for Opera's (and others) UA string changes in v10.00
+        $version = '';
         $start=$title;
         if((strtolower($this->__title)==strtolower("Opera") || strtolower($this->__title)==strtolower("Opera Next")) && preg_match('/Version/i', $this->useragent))
             $start="Version";
@@ -88,8 +89,8 @@ class UserAgentHelper extends AppHelper {
             $start="UC Browse";
 
         //Grab the browser version if its present
-        preg_match('/'.$start.'[\ |\/]?([.0-9a-zA-Z]+)/i', $this->useragent, $regmatch);
-        $version=$regmatch[1];
+        if(preg_match('/'.$start.'[\ |\/]?([.0-9a-zA-Z]+)/i', $this->useragent, $regmatch))
+            $version=$regmatch[1];
 
         //Return browser Title and Version, but first..some titles need to be changed
         if(strtolower($this->__title)=="msie" && strtolower($version)=="7.0" && preg_match('/Trident\/4.0/i', $this->useragent))
@@ -1212,6 +1213,7 @@ class UserAgentHelper extends AppHelper {
     }
 
     private function detect_os(){
+        $version = '';
         if(preg_match('/AmigaOS/i', $this->useragent)){
             $this->__link="http://en.wikipedia.org/wiki/AmigaOS";
             $this->__title="AmigaOS";
@@ -1574,6 +1576,10 @@ class UserAgentHelper extends AppHelper {
         if($useragent!==null) $this->useragent = $useragent;
         $type = $this->detect_platform();
         // Add Unknown Icon
+        if($type===null) {
+            $type = 'os';
+            $this->__code = 'unknown';
+        }
         return $this->Html->image('/user_agent/img/16/'.$type.'/'.$this->__code.'.png', array('alt' => $this->__title));
     }
 
